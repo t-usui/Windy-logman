@@ -26,6 +26,7 @@ class Log:
 
 
 	def parse_xml(self, filename):
+		print "Parsing XML file ......",
 		dom = xml.dom.minidom.parse(filename)
 
 		for node1st in dom.documentElement.childNodes:
@@ -44,11 +45,10 @@ class Log:
 					else:
 						continue
 
-		self.clean_data()
+		print " Done"
 
 
 	def parse_timestamp(self, timestamp):
-		# 2011-01-12T18:00:42.642395600Z
 		pattern = "([0-9]+)-([0-9]+)-([0-9]+)T([0-9]+):([0-9]+):([0-9]+).([0-9]+)Z"
 
 		# To be revised to compile only 1st time
@@ -73,9 +73,10 @@ class Log:
 		return result.group(0)
 
 
-	def clean_data(self):
+	def cleanse_data(self):
 		i = 0
 
+		print "Cleansing log data ......",
 		while(i < self.datanum-1):
 			if self.user[i] == "SYSTEM" or self.user[i] == "NETWORK SERVICE" or self.user[i] == "LOCAL SERVICE":
 				self.timestamp.pop(i)
@@ -84,6 +85,8 @@ class Log:
 				self.datanum -= 1
 				continue
 			i += 1
+
+		print " Done"
 
 
 	def init_aggregate_data(self):
@@ -105,6 +108,8 @@ class Log:
 
 	def aggregate_data_by_date(self):
 		previous_date = None		# the date which this routine is focusing on, not today
+
+		print "Aggregating log data ......",
 
 		for i in range(0, self.datanum-1):
 			previous_date = self.timestamp[i].date()
@@ -129,6 +134,8 @@ class Log:
 
 			else:
 				print "Unknown host is found"
+
+		print " Done"
 
 
 	def print_history(self):
@@ -177,10 +184,9 @@ if __name__ == "__main__":
 	log = Log()
 
 	log.parse_xml(filename)
-	## log.print_history()
+	log.cleanse_data()
 	log.init_aggregate_data()
 	log.aggregate_data_by_date()
-	## log.print_aggregate_result()
 	log.print_sorted_aggregate_result()
 
 	log.generate_output_file("logon_output.dat")
